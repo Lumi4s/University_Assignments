@@ -1,4 +1,4 @@
-package io.github.Concurrentnost.threads;
+package io.github.MultithreadedProgramming.threads;
 
 public class HoneyPot {
 

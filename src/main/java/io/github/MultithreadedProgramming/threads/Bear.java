@@ -1,12 +1,12 @@
-package io.github.Concurrentnost.threads;
+package io.github.MultithreadedProgramming.threads;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Bee implements Runnable {
+public class Bear implements Runnable {
 
     private final HoneyPot pot;
 
-    public Bee(HoneyPot pot) {
+    public Bear(HoneyPot pot) {
         this.pot = pot;
     }
 
@@ -16,9 +16,8 @@ public class Bee implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
 
             try {
-                pot.addHoney();
-
-                Thread.sleep(ThreadLocalRandom.current().nextInt(150, 251));
+                pot.eatHoney();
+                Thread.sleep(ThreadLocalRandom.current().nextInt(450, 551));
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

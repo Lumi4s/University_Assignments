@@ -1,8 +1,8 @@
-package io.github.Concurrentnost;
+package io.github.MultithreadedProgramming;
 
-import io.github.Concurrentnost.threads.Bear;
-import io.github.Concurrentnost.threads.Bee;
-import io.github.Concurrentnost.threads.HoneyPot;
+import io.github.MultithreadedProgramming.threads.Bear;
+import io.github.MultithreadedProgramming.threads.Bee;
+import io.github.MultithreadedProgramming.threads.HoneyPot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
