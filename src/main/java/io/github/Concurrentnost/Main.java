@@ -1,15 +1,47 @@
 package io.github.Concurrentnost;
 
-//9. Задача о медведе и пчелах
-//Есть N пчел и медведь. Они пользуются одним горшком меда, вмещающим H порций меда. Сначала
-//горшок пустой. Пока горшок не наполнится, медведь спит, потом съедает весь мед и засыпает. Каждая
-//пчела многократно собирает по одной порции меда и кладет ее в горшок. Пчела, которая приносит
-//последнюю порцию меда и заполняет горшок, будит медведя. Представьте медведя и пчел процессами,
-//разработайте код, моделирующий их действия.
+import io.github.Concurrentnost.threads.Bear;
+import io.github.Concurrentnost.threads.Bee;
+import io.github.Concurrentnost.threads.HoneyPot;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-    static void main() {
 
+    static void main(String[] args) throws IOException {
+
+        System.out.print("N: ");
+        int N = readInt();
+
+        System.out.print("H: ");
+        int H = readInt();
+
+        HoneyPot pot = new HoneyPot(H);
+
+        Thread bear = new Thread(new Bear(pot), "Bear");
+        bear.start();
+
+        List<Thread> beeThreads = new ArrayList<>();
+
+        for (int i = 0; i < N; i++) {
+            Thread beeThread = new Thread(
+                    new Bee(pot),
+                    "Bee" + i
+            );
+
+            beeThread.start();
+            beeThreads.add(beeThread);
+        }
+    }
+
+    private static int readInt() throws IOException {
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        return Integer.parseInt(reader.readLine());
     }
 }
