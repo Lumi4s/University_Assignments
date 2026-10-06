@@ -17,26 +17,36 @@ public class Main {
         Statement stmt = conn.createStatement();
 
         ResultSet rs = stmt.executeQuery(
-                "SELECT * FROM sample");
+                "SELECT " +
+                        "s.id_sample, " +
+                        "s.name AS sample_name, " +
+                        "s.substance, " +
+                        "b.id_brigade, " +
+                        "b.name AS brigade_name " +
+                        "FROM sample AS s " +
+                        "LEFT JOIN brigade AS b ON s.id_brigade = b.id_brigade"
+        );
+
+
+        String separator = "+-----+---------------------------+----------------------+---------------------------+";
+
+        System.out.println(separator);
+        System.out.printf("| %-3s | %-25s | %-20s | %-25s |%n",
+                "ID", "Название", "Вещество", "Бригада");
+        System.out.println(separator);
 
         while (rs.next()) {
-            System.out.println(
-                    rs.getInt("id_sample") + ". " +
-                            rs.getString("name") + " — " +
-                            rs.getString("substance"));
+            System.out.printf("| %-3d | %-25s | %-20s | %-25s |%n",
+                    rs.getInt("id_sample"),
+                    rs.getString("sample_name"),
+                    rs.getString("substance"),
+                    rs.getString("brigade_name")
+            );
         }
 
-        System.out.println("");
+        System.out.println(separator);
 
-        rs = stmt.executeQuery(
-                "SELECT * FROM sample WHERE id_brigade = 1");
 
-        while (rs.next()) {
-            System.out.println(
-                    rs.getInt("id_sample") + ". " +
-                            rs.getString("name") + " — " +
-                            rs.getString("substance"));
-        }
 
         rs.close();
         stmt.close();
