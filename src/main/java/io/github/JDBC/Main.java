@@ -17,29 +17,25 @@ public class Main {
         Statement stmt = conn.createStatement();
 
         ResultSet rs = stmt.executeQuery(
-                "SELECT * FROM sample"
-        );
+                "SELECT * FROM sample");
 
         while (rs.next()) {
             System.out.println(
                     rs.getInt("id_sample") + ". " +
                             rs.getString("name") + " — " +
-                            rs.getString("substance")
-            );
+                            rs.getString("substance"));
         }
 
-        System.out.println("\n\n");
+        System.out.println("");
 
         rs = stmt.executeQuery(
-                "SELECT * FROM sample WHERE id_brigade = 1"
-        );
+                "SELECT * FROM sample WHERE id_brigade = 1");
 
         while (rs.next()) {
             System.out.println(
                     rs.getInt("id_sample") + ". " +
                             rs.getString("name") + " — " +
-                            rs.getString("substance")
-            );
+                            rs.getString("substance"));
         }
 
         rs.close();
