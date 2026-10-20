@@ -10,7 +10,7 @@ pkgs.mkShell {
     pkgs.maven            
     pkgs.gradle           
     pkgs.git
-    pkgs.zlib            
+    pkgs.zlib
   ];
 
   shellHook = ''

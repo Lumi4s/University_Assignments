@@ -1,13 +1,13 @@
 CREATE TABLE brigade (
-                         id_brigade SERIAL PRIMARY KEY,
-                         name VARCHAR(100) NOT NULL
+    id_brigade SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE sample (
-                        id_sample SERIAL PRIMARY KEY,
-                        name VARCHAR(100) NOT NULL,
-                        substance VARCHAR(100),
-                        id_brigade INTEGER REFERENCES brigade(id_brigade)
+    id_sample SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    substance VARCHAR(100),
+    id_brigade INTEGER REFERENCES brigade(id_brigade)
 );
 
 INSERT INTO brigade (name)
