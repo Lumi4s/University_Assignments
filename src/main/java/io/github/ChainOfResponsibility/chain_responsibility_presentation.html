@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chain of Responsibility — GoF</title>
+<style>
+:root{--bg:#080e1b;--panel:#111e31;--line:#29415f;--txt:#eef5ff;--muted:#a2b4cc;--blue:#82adff;--cyan:#69dfd8;--green:#7be0ae;--amber:#ffc27c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 10%,#1b3a6055,transparent 38%),radial-gradient(ellipse at 90% 85%,#14514a33,transparent 35%),var(--bg);color:var(--txt);font:16px/1.5 Inter,system-ui,"Segoe UI",sans-serif;height:100vh;overflow:hidden}
+.deck{height:100%;position:relative}.slide{position:absolute;inset:0;padding:6vh 8vw 95px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(30px);pointer-events:none;transition:.4s}.slide.active{opacity:1;transform:none;pointer-events:auto}
+.kicker{color:var(--cyan);font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;margin-bottom:20px}
+h1{font-size:clamp(42px,7vw,88px);line-height:.98;letter-spacing:-.055em;margin:0}h2{font-size:clamp(32px,4.5vw,58px);line-height:1.04;letter-spacing:-.045em;margin:0 0 15px}.blue{color:var(--blue)}.mint{color:var(--cyan)}.lead{font-size:clamp(18px,2vw,24px);color:#c4d3e8;max-width:850px;margin:24px 0}.sub,.muted{color:var(--muted);font-size:14px}
+.heroTag{display:inline-flex;align-items:center;gap:9px;border:1px solid #3a5c83;background:#13243a;border-radius:99px;padding:8px 13px;margin-bottom:30px;width:max-content;font-size:13px}.pulse{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 14px var(--green)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:25px}.card{background:linear-gradient(145deg,#15263ddd,#101b2cdd);border:1px solid var(--line);border-radius:20px;padding:23px;box-shadow:0 18px 50px #0002}.card h3{margin:0 0 13px;font-size:19px}.card p{color:#bdcce0;margin:0}.tag{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:8px}.bad{background:#482d30;color:#ffb9ae}.good{background:#173b35;color:#9af0c4}
+ul{padding-left:19px;color:#c3d2e5}li{margin:10px 0}.flow{display:flex;align-items:center;gap:9px;margin:30px 0;flex-wrap:wrap}.node{flex:1;min-width:125px;text-align:center;padding:17px 10px;border:1px solid #42658f;background:#152a46;border-radius:15px;transition:background .25s,border-color .25s,box-shadow .25s,transform .25s,opacity .25s}.node.current{border:2px solid var(--amber);background:#49371f;box-shadow:0 0 0 4px #ffc27c33,0 0 24px #ffc27c55;transform:translateY(-7px);opacity:1}.node.done{border:2px solid var(--green);background:#163b32;box-shadow:0 0 0 3px #7be0ae22;opacity:1}.node.skip{border-color:#60718a;background:#182235;opacity:.38;filter:saturate(.5)}.node strong{display:block}.node small{display:block;color:var(--muted);margin-top:5px;font-size:12px}.arrow{color:var(--cyan);font-size:23px}
+.diagram{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;margin:30px 0}.client{background:#142b49;border:1px solid #527db4;border-radius:16px;padding:20px;text-align:center}.chain{display:flex;align-items:center;gap:8px}.handler{flex:1;text-align:center;padding:17px 8px;background:#14243a;border:1px solid var(--line);border-radius:14px;transition:.2s}.handler strong,.handler small{display:block}.handler small{font-size:11px;color:var(--muted)}.handler.current{border-color:var(--amber);box-shadow:0 0 0 3px #ffc27c22;transform:translateY(-4px)}.handler.done{border-color:var(--green);background:#16362f}.handler.skip{opacity:.42}
+.sim{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:4px}select,button{font:inherit}select{background:#101d30;color:var(--txt);border:1px solid #405b7d;border-radius:10px;padding:10px 13px}.btn{cursor:pointer;border:1px solid #466b99;border-radius:10px;padding:10px 15px;background:#1a3557;color:white}.btn.primary{background:linear-gradient(120deg,#477fe0,#267e91);border:0;font-weight:700}.btn:hover{filter:brightness(1.15)}.result{margin-top:14px;background:#102b29;border:1px solid #315d52;color:#baf1d9;border-radius:12px;padding:13px 15px;font:13px/1.6 Consolas,monospace;min-height:48px}
+.codegrid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:22px}.code{background:#080f1c;border:1px solid var(--line);border-radius:16px;padding:19px;overflow:auto}pre{margin:0;font:12px/1.65 Consolas,monospace;color:#d9e8fa;white-space:pre}.explain{display:grid;gap:10px}.explain .card{padding:15px 18px}.explain h3{font-size:15px;margin-bottom:5px}.explain p{font-size:13px}.pill{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 9px;color:#b9cce4;font-size:12px;margin:3px}
+.footer{position:absolute;bottom:22px;left:8vw;right:8vw;display:flex;align-items:center;gap:16px;color:#8195b1;font-size:12px}.progress{height:3px;flex:1;background:#203149;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));width:20%;transition:.3s}.controls{display:flex;align-items:center;gap:8px}.icon{width:35px;height:33px;border-radius:9px;background:#111e30;border:1px solid #304967;color:white;cursor:pointer}.icon:disabled{opacity:.3}.counter{min-width:40px;text-align:center}.hint{color:#617894}
+@media(max-width:760px){.slide{padding:25px 22px 90px;justify-content:flex-start;overflow:auto}.grid,.codegrid{grid-template-columns:1fr}.diagram{grid-template-columns:1fr}.chain{flex-wrap:wrap}.handler{min-width:25%}.footer{left:22px;right:22px}.hint{display:none}.node{min-width:26%}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><main class="deck">
+<section class="slide active"><div class="kicker">Паттерны проектирования · GoF</div><div class="heroTag"><i class="pulse"></i> Поведенческий паттерн</div><h1>Chain of<br><span class="blue">Responsibility</span></h1><div class="lead">Цепочка обязанностей</div><p class="lead" style="font-size:clamp(17px,1.8vw,22px)">Запрос проходит через последовательность обработчиков — пока один из них не возьмёт его на себя.</p><p class="muted" style="margin-top:45px">Пример реализации на Java</p></section>
+
+<section class="slide"><div class="kicker">01 / Проблема</div><h2>Когда один метод<br>знает <span class="blue">слишком много</span></h2><p class="sub">Представим обработку заказа в интернет-магазине.</p><div class="grid"><article class="card"><span class="tag bad">Без паттерна</span><h3 style="margin-top:16px">Один большой обработчик</h3><ul><li>Проверяет авторизацию</li><li>Проверяет наличие товара</li><li>Проверяет оплату</li><li>Подтверждает заказ</li></ul><p>Клиентский код разрастается и зависит от всех проверок.</p></article><article class="card"><span class="tag good">С паттерном</span><h3 style="margin-top:16px">Отдельные обработчики</h3><div style="display:grid;gap:6px;margin:14px 0"><div class="node">Авторизация</div><div class="arrow" style="text-align:center">↓</div><div class="node">Проверка товара</div><div class="arrow" style="text-align:center">↓</div><div class="node">Проверка оплаты</div></div><p>Каждый объект отвечает за свою часть и может передать запрос дальше.</p></article></div></section>
+
+<section class="slide"><div class="kicker">02 / Устройство</div><h2>Запрос движется<br>по <span class="mint">цепочке</span></h2><p class="sub">Отправитель знает только первый обработчик. Остальное решает сама цепочка.</p><div class="diagram"><div class="client"><b>Client</b><br><small class="muted">отправляет запрос</small></div><div class="chain"><div class="handler"><strong>Handler A</strong><small>проверка</small></div><span class="arrow">→</span><div class="handler"><strong>Handler B</strong><small>проверка</small></div><span class="arrow">→</span><div class="handler"><strong>Handler C</strong><small>проверка</small></div></div></div><div class="card"><ul><li><b>Handler</b> — общий контракт обработчика.</li><li><b>ConcreteHandler</b> — конкретная проверка и обработка.</li><li><b>next</b> — ссылка на следующего участника цепочки.</li></ul></div><p class="muted" style="margin-top:15px">Обработчик либо принимает запрос, либо передаёт его дальше. Если цепочка закончилась, запрос может остаться необработанным.</p></section>
+
+<section class="slide"><div class="kicker">03 / Интерактивный пример</div><h2>Техподдержка:<br><span class="blue">кто решит проблему?</span></h2><p class="sub">Сложность обращения определяет, какой специалист сможет его обработать.</p><div class="flow" id="supportChain"><div class="node" data-limit="2"><strong>1-я линия</strong><small>сложность ≤ 2</small></div><span class="arrow">→</span><div class="node" data-limit="4"><strong>2-я линия</strong><small>сложность ≤ 4</small></div><span class="arrow">→</span><div class="node" data-limit="10"><strong>Руководитель</strong><small>сложность ≤ 10</small></div></div><div class="sim"><label for="complexity" class="sub">Сложность обращения</label><select id="complexity"><option value="1">1 — сброс пароля</option><option value="3" selected>3 — ошибка базы данных</option><option value="7">7 — сбой сервера</option><option value="11">11 — критическая проблема</option></select><button class="btn primary" id="run">Запустить запрос ↗</button><button class="btn" id="reset">Сбросить</button></div><div class="result" id="result" aria-live="polite">Ожидает запроса. Выберите сложность и запустите цепочку.</div><p class="muted" style="margin-top:12px">Подсветка показывает, как запрос проходит по цепочке.</p></section>
+
+<section class="slide"><div class="kicker">04 / Оценка паттерна</div><h2>Плюсы и <span class="blue">ограничения</span></h2><div class="grid"><article class="card"><span class="tag good">Преимущества</span><ul><li><b>Слабая связанность:</b> отправителю не нужно знать конкретного обработчика.</li><li><b>Расширяемость:</b> новый обработчик можно добавить без изменения клиента.</li><li><b>Гибкость:</b> порядок и состав цепочки можно менять.</li><li><b>Единая ответственность:</b> каждый обработчик решает одну задачу.</li></ul></article><article class="card"><span class="tag bad">Недостатки</span><ul><li><b>Нет гарантии обработки:</b> запрос может дойти до конца цепочки без результата.</li><li><b>Сложнее отладка:</b> не всегда очевидно, какой обработчик получит запрос.</li><li><b>Затраты на проход:</b> длинная цепочка добавляет проверки и переходы.</li><li><b>Порядок важен:</b> неверная последовательность может привести к неправильной обработке.</li></ul></article></div><p class="lead" style="font-size:clamp(17px,1.9vw,22px)">Паттерн полезен, когда заранее неизвестно, кто именно должен обработать запрос, а набор обработчиков может меняться.</p></section>
+
+<section class="slide"><div class="kicker">05 / Реализация на Java</div><h2>В коде это<br>выглядит <span class="mint">просто</span></h2><div class="codegrid"><div class="code"><pre>public abstract class SupportHandler {
+    private SupportHandler next;
+
+    public SupportHandler setNext(
+            SupportHandler next) {
+        this.next = next;
+        return next;
+    }
+
+    public void handle(SupportRequest r) {
+        if (canHandle(r)) {
+            process(r);
+        } else if (next != null) {
+            next.handle(r);
+        }
+    }
+
+    protected abstract boolean
+        canHandle(SupportRequest r);
+    protected abstract void
+        process(SupportRequest r);
+}</pre></div><div class="explain"><article class="card"><h3>① setNext()</h3><p>Связывает обработчики в цепочку.</p></article><article class="card"><h3>② canHandle()</h3><p>Определяет, подходит ли текущий обработчик.</p></article><article class="card"><h3>③ process() / next.handle()</h3><p>Обрабатывает запрос или передаёт его дальше.</p></article><div><span class="pill">Слабая связанность</span><span class="pill">Расширяемость</span><span class="pill">Гибкий порядок</span></div></div></div><p class="lead" style="font-size:clamp(18px,2.2vw,27px);text-align:center;margin:28px auto 0">Главный признак: каждый обработчик решает — <span class="mint">обработать запрос или передать дальше.</span></p></section>
+
+<footer class="footer"><span id="name">Введение</span><div class="progress"><span id="bar"></span></div><div class="controls"><button class="icon" id="prev">←</button><span class="counter" id="count">1 / 6</span><button class="icon" id="next">→</button></div><span class="hint">← → навигация · F — полный экран</span></footer></main>
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const slideNames = ['Введение', 'Проблема', 'Устройство', 'Пример', 'Плюсы и минусы', 'Java'];
+
+const counterEl = document.getElementById('count');
+const nameEl = document.getElementById('name');
+const barEl = document.getElementById('bar');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+let currentSlide = 0;
+
+function showSlide(n) {
+  currentSlide = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((slide, i) => slide.classList.toggle('active', i === currentSlide));
+  counterEl.textContent = `${currentSlide + 1} / ${slides.length}`;
+  nameEl.textContent = slideNames[currentSlide];
+  barEl.style.width = `${(currentSlide + 1) / slides.length * 100}%`;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === slides.length - 1;
+}
+
+prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'ArrowRight' || event.key === ' ') {
+    event.preventDefault();
+    showSlide(currentSlide + 1);
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    showSlide(currentSlide - 1);
+  } else if (event.key.toLowerCase() === 'f') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+});
+
+// Interactive Chain of Responsibility demo.
+const complexitySelect = document.getElementById('complexity');
+const runButton = document.getElementById('run');
+const resetButton = document.getElementById('reset');
+const resultBox = document.getElementById('result');
+const handlerNodes = [...document.querySelectorAll('#supportChain .node')];
+
+let simulationTimers = [];
+let simulationRunId = 0;
+
+function clearSimulationTimers() {
+  simulationTimers.forEach(timer => clearTimeout(timer));
+  simulationTimers = [];
+}
+
+function resetSimulation() {
+  // Invalidates callbacks from any previous run as an extra safety measure.
+  simulationRunId++;
+  clearSimulationTimers();
+  handlerNodes.forEach(node => node.classList.remove('current', 'done', 'skip'));
+  resultBox.textContent = 'Ожидает запроса. Выберите сложность и запустите цепочку.';
+  runButton.disabled = false;
+}
+
+function schedule(callback, delay, runId) {
+  const timer = setTimeout(() => {
+    if (runId === simulationRunId) callback();
+  }, delay);
+  simulationTimers.push(timer);
+}
+
+function runSimulation() {
+  resetSimulation();
+  const runId = simulationRunId;
+  const complexity = Number(complexitySelect.value);
+
+  resultBox.textContent = 'Запрос отправлен первому обработчику…';
+  runButton.disabled = true;
+
+  function visitHandler(index) {
+    if (runId !== simulationRunId) return;
+
+    if (index >= handlerNodes.length) {
+      resultBox.textContent = '✕ Ни один обработчик не смог принять запрос. Цепочка завершена без результата.';
+      runButton.disabled = false;
+      return;
+    }
+
+    const node = handlerNodes[index];
+    const name = node.querySelector('strong').textContent;
+    const limit = Number(node.dataset.limit);
+
+    node.classList.add('current');
+    resultBox.textContent = `${name}: проверяет сложность ${complexity}…`;
+
+    schedule(() => {
+      node.classList.remove('current');
+
+      if (complexity <= limit) {
+        node.classList.add('done');
+        resultBox.textContent = `✓ Запрос обработан: ${name}. Цепочка остановлена.`;
+        runButton.disabled = false;
+        return;
+      }
+
+      node.classList.add('skip');
+      resultBox.textContent = `${name} не может обработать запрос. Передача следующему…`;
+      schedule(() => visitHandler(index + 1), 450, runId);
+    }, 650, runId);
+  }
+
+  visitHandler(0);
+}
+
+runButton.addEventListener('click', runSimulation);
+resetButton.addEventListener('click', resetSimulation);
+
+showSlide(0);
+resetSimulation();
+</script></body></html>
