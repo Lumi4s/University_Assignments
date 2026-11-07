@@ -1,15 +1,15 @@
-package io.github.ProgrammingPatterns.punic;
+package io.github.ProgrammingPatterns2.punic;
 
-public class Horseman extends BaseWarrior {
+public class Infantryman extends BaseWarrior {
 
-    public Horseman(String name, int health, int damage,
-                    int speed, int defense) {
+    public Infantryman(String name, int health, int damage,
+                       int speed, int defense) {
         super(name, health, damage, speed, defense);
     }
 
     @Override
     public void info() {
-        System.out.println("Horseman: " + name);
+        System.out.println("Infantryman: " + name);
         System.out.println("Health: " + health);
         System.out.println("Damage: " + damage);
         System.out.println("Speed: " + speed);

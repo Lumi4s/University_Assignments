@@ -1,4 +1,4 @@
-package io.github.ProgrammingPatterns.punic;
+package io.github.ProgrammingPatterns1.punic;
 
 public class Infantryman extends BaseWarrior {
 

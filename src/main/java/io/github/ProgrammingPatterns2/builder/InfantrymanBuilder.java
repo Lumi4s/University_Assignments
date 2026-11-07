@@ -1,9 +1,9 @@
-package io.github.ProgrammingPatterns.builder;
+package io.github.ProgrammingPatterns2.builder;
 
-import io.github.ProgrammingPatterns.punic.Archer;
-import io.github.ProgrammingPatterns.punic.Warrior;
+import io.github.ProgrammingPatterns2.punic.Infantryman;
+import io.github.ProgrammingPatterns2.punic.Warrior;
 
-public class ArcherBuilder implements WarriorBuilder {
+public class InfantrymanBuilder implements WarriorBuilder {
     private String name;
     private int health;
     private int damage;
@@ -42,15 +42,13 @@ public class ArcherBuilder implements WarriorBuilder {
 
     @Override
     public Warrior build() {
-        Archer archer = new Archer(name, health, damage, speed, defense);
-        if (archer.doQualityCheck()) {
-            return archer;
+        Infantryman infantryman = new Infantryman(name, health, damage, speed, defense);
+        if (infantryman.doQualityCheck()) {
+            return infantryman;
         } else {
-            System.out.println("Archer build is incomplete.");
+            System.out.println("Infantryman build is incomplete.");
         }
 
         return null;
     }
-
-
 }

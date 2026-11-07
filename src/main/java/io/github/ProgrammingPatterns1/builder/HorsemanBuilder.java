@@ -1,7 +1,7 @@
-package io.github.ProgrammingPatterns.builder;
+package io.github.ProgrammingPatterns1.builder;
 
-import io.github.ProgrammingPatterns.punic.Horseman;
-import io.github.ProgrammingPatterns.punic.Warrior;
+import io.github.ProgrammingPatterns1.punic.Horseman;
+import io.github.ProgrammingPatterns1.punic.Warrior;
 
 public class HorsemanBuilder implements WarriorBuilder {
     private String name;

@@ -1,7 +1,7 @@
-package io.github.ProgrammingPatterns;
+package io.github.ProgrammingPatterns1;
 
-import io.github.ProgrammingPatterns.builder.*;
-import io.github.ProgrammingPatterns.punic.Warrior;
+import io.github.ProgrammingPatterns1.builder.*;
+import io.github.ProgrammingPatterns1.punic.Warrior;
 
 public class Main {
     static void main(String[] args) {
